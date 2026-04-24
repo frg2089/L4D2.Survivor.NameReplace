@@ -20,25 +20,45 @@ string language = args.Length >= 2 ? args[1] : "schinese";
 if (!Directory.Exists(installedPath))
     throw new DirectoryNotFoundException("Cannot found the Game folder.");
 
-SurvivorNames target = new()
+var config = Path.Combine(AppContext.BaseDirectory, "SurvivorNames.ini");
+SurvivorNames target = new();
+using (var reader = File.OpenText(config))
 {
-    // Rochelle = "しまかぜ",
-    // Coach = "ときつかぜ",
-    // Ellis = "ゆうだち",
-    // Nick = "あまつかぜ",
-    // Bill = "はつづき",
-    // Zoey = "しまかぜ",
-    // Francis = "かわかぜ",
-    // Louis = "うみかぜ",
-    Rochelle = "岛风",
-    Coach = "时津风",
-    Ellis = "夕立",
-    Nick = "天津风",
-    Bill = "初月",
-    Zoey = "岛风",
-    Francis = "江风",
-    Louis = "海风",
-};
+    while (await reader.ReadLineAsync() is { } line)
+    {
+        var kvp = line.Split('=', 2);
+        if (kvp.Length is not 2)
+            continue;
+
+        switch (kvp[0])
+        {
+            case "Rochelle":
+                target.Rochelle = kvp[1];
+                break;
+            case "Coach":
+                target.Coach = kvp[1];
+                break;
+            case "Ellis":
+                target.Ellis = kvp[1];
+                break;
+            case "Nick":
+                target.Nick = kvp[1];
+                break;
+            case "Bill":
+                target.Bill = kvp[1];
+                break;
+            case "Zoey":
+                target.Zoey = kvp[1];
+                break;
+            case "Francis":
+                target.Francis = kvp[1];
+                break;
+            case "Louis":
+                target.Louis = kvp[1];
+                break;
+        }
+    }
+}
 
 var vpk = Path.Combine(installedPath, "bin", "vpk.exe");
 
