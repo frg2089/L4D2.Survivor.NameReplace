@@ -47,7 +47,7 @@ ImmutableArray<string> dirs = ["left4dead2", "left4dead2_dlc1", "left4dead2_dlc2
 var vpks = dirs.Select(i => Path.Combine(installedPath, i, "pak01_dir.vpk")).ToImmutableArray();
 
 var tmpdir = Directory.CreateTempSubdirectory();
-var workdir = tmpdir.CreateSubdirectory("l4d2");
+var workdir = tmpdir.CreateSubdirectory("l4d2-survivor-name-replace");
 
 File.WriteAllText(
     Path.Combine(workdir.FullName, "addoninfo.txt"),
