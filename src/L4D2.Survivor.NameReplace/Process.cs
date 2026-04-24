@@ -83,9 +83,9 @@ internal sealed class Processor(SurvivorNames target) : IDisposable
         vpkPath = Path.GetFullPath(vpkPath);
         if (!_packages.TryGetValue(vpkPath, out var pkg))
         {
-            pkg = new();
+            pkg ??= new();
             pkg.Read(vpkPath);
-            _packages[vpkPath] = pkg;
+            _packages[vpkPath] = new();
         }
 
         if (pkg.FindEntry(entryName) is not { } entry)
@@ -152,12 +152,12 @@ internal sealed class Processor(SurvivorNames target) : IDisposable
         }
     }
 
-    // // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
-    // ~Processor()
-    // {
-    //     // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-    //     Dispose(disposing: false);
-    // }
+    // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
+    ~Processor()
+    {
+        // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+        Dispose(disposing: false);
+    }
 
     public void Dispose()
     {

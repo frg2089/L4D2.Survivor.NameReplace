@@ -13,11 +13,7 @@ namespace L4D2.Survivor.NameReplace;
 internal sealed class RootCommand
 {
     [CliOption(Description = "游戏文件夹")]
-    public DirectoryInfo? GameFolder { get; set; } = !OperatingSystem.IsWindows() || Registry.LocalMachine
-        .OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 550")
-        ?.GetValue("InstallLocation") is not string path
-        ? null
-        : new(path);
+    public DirectoryInfo? GameFolder { get; set; } = GetGameFolder();
 
     [CliArgument(Description = "语言")]
     public string Language { get; set; } = "schinese";
@@ -78,19 +74,22 @@ internal sealed class RootCommand
         processor.Process(packages[0], Processor.JoinPath("resource", $"closecaption_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"closecaption_{Language}.txt"));
         processor.Process(packages[0], Processor.JoinPath("resource", $"subtitles_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"subtitles_{Language}.txt"));
 
-        Process.Start(new ProcessStartInfo()
+        using (var process = Process.Start(new ProcessStartInfo()
         {
             FileName = vpk,
             Arguments = workdir.FullName,
             UseShellExecute = true,
-        })?.WaitForExit();
+        }))
+            process?.WaitForExit();
 
-        Process.Start(new ProcessStartInfo()
+
+        using (var process = Process.Start(new ProcessStartInfo()
         {
             FileName = "explorer.exe",
             Arguments = $"\"{tmpdir.FullName}\"",
             UseShellExecute = true,
-        })?.WaitForExit();
+        }))
+            process?.WaitForExit();
     }
 
     private async Task<SurvivorNames> LoadSurvivorNames()
@@ -133,5 +132,19 @@ internal sealed class RootCommand
         }
 
         return target;
+    }
+
+    public static DirectoryInfo? GetGameFolder()
+    {
+        if (!OperatingSystem.IsWindows())
+            return null;
+
+        using var key = Registry.LocalMachine
+            .OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 550");
+
+        if (key?.GetValue("InstallLocation") is not string path)
+            return null;
+
+        return new(path);
     }
 }
