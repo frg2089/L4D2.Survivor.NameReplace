@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/CI.yml      
+      - .config/dotnet-tools.json
+      - global.json
+      - nuget.config
+      - L4D2.Survivor.NameReplace.slnx
+      - Directory.Build.props
+      - Directory.Build.targets
+      - Directory.Packages.props
+      - "src/**/*"
+    tags:
+      - 'v*'
+
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/CI.yml      
+      - .config/dotnet-tools.json
+      - global.json
+      - nuget.config
+      - L4D2.Survivor.NameReplace.slnx
+      - Directory.Build.props
+      - Directory.Build.targets
+      - Directory.Packages.props
+      - "src/**/*"
+
+jobs:
+  build:
+    name: .Net 构建
+    runs-on: windows-latest
+    steps:
+      - name: 签出仓库
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: 配置 .Net 环境
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: ./global.json
+
+      - name: 还原本地工具
+        run: dotnet tool restore
+
+      - name: 还原
+        run: dotnet restore --graph --artifacts-path artifacts
+
+      - name: 生成
+        run: dotnet build --graph --artifacts-path artifacts --configuration Release --no-restore
+
+      - name: 打包
+        run: dotnet pack --graph --artifacts-path artifacts --configuration Release --no-restore --no-build --include-symbols --include-source
