@@ -15,8 +15,11 @@ internal sealed class RootCommand
     [CliOption(Description = "游戏文件夹")]
     public DirectoryInfo? GameFolder { get; set; } = GetGameFolder();
 
-    [CliArgument(Description = "语言")]
-    public string Language { get; set; } = "schinese";
+    [CliOption(Description = "源语言")]
+    public string? SourceLanguage { get; set; } = GetLanguage();
+
+    [CliOption(Description = "目标语言")]
+    public string? TargetLanguage { get; set; } = "english";
 
     [CliOption(Description = "求生者名称模板文件")]
     public FileInfo SurvivorNames { get; set; } = new(Path.Combine(AppContext.BaseDirectory, "SurvivorNames.ini"));
@@ -27,6 +30,10 @@ internal sealed class RootCommand
     {
         if (GameFolder is null)
             throw new DirectoryNotFoundException("Cannot found Left 4 dead 2's Game Folder.");
+        if (string.IsNullOrEmpty(SourceLanguage))
+            throw new InvalidDataException("SourceLanguage is null or empty.");
+        if (string.IsNullOrEmpty(TargetLanguage))
+            throw new InvalidDataException("TargetLanguage is null or empty.");
 
         var vpk = Path.Combine(GameFolder.FullName, "bin", "vpk.exe");
         var target = await LoadSurvivorNames();
@@ -45,35 +52,41 @@ internal sealed class RootCommand
             "AddonInfo"
             {
                 addonSteamAppID 550      
-                addonversion 1.0
+                addonversion "N/A"
                 addontitle "Survivor Name Replace"
                 addonauthor "L4D2.Survivor.NameReplace ♥ from frg2089"
-                addonDescription "{{target}}"
+                addonDescription "Language: {{SourceLanguage}}
+            {{target}}"
 
                 addonContent_Campaign 0
-                addonContent_Script 0
-                addonContent_Music 0
-                addonContent_Sound 0
-                addonContent_prop 0
-                addonContent_Prefab 0
-                addonContent_BackgroundMovie 0
-                addonContent_Survivor 1
+                addonContent_Map 0
+                addonContent_Skin 0
+                addonContent_weapon 0
                 addonContent_BossInfected 0
                 addonContent_CommonInfected 0
-                addonContent_WeaponModel 0
-                addonContent_weapon 0
-                addonContent_Skin 0
-                addonContent_Spray 0
-                addonContent_Map 0
+                addonContent_Survivor 1
+                addonContent_Sound 0
+                addonContent_Music 0
+                addonContent_Script 0
+                addonContent_Prop 0
             }
             """);
 
         Processor processor = new(target);
 
-        processor.InitSurvivorsName(package, Language);
-        processor.Process(package, Processor.JoinPath("resource", $"l4d360ui_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"l4d360ui_{Language}.txt"));
-        processor.Process(package, Processor.JoinPath("resource", $"closecaption_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"closecaption_{Language}.txt"));
-        processor.Process(package, Processor.JoinPath("resource", $"subtitles_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"subtitles_{Language}.txt"));
+        processor.InitSurvivorsName(package, SourceLanguage);
+        processor.Process(
+            package, 
+            Processor.JoinPath("resource", $"l4d360ui_{SourceLanguage}.txt"), 
+            Path.Combine(workdir.FullName, "resource", $"l4d360ui_{TargetLanguage}.txt"));
+        processor.Process(
+            package, 
+            Processor.JoinPath("resource", $"closecaption_{SourceLanguage}.txt"), 
+            Path.Combine(workdir.FullName, "resource", $"closecaption_{TargetLanguage}.txt"), true);
+        processor.Process(
+            package, 
+            Processor.JoinPath("resource", $"subtitles_{SourceLanguage}.txt"), 
+            Path.Combine(workdir.FullName, "resource", $"subtitles_{TargetLanguage}.txt"));
 
         using (var process = Process.Start(new ProcessStartInfo()
         {
@@ -82,7 +95,6 @@ internal sealed class RootCommand
             UseShellExecute = true,
         }))
             process?.WaitForExit();
-
 
         using (var process = Process.Start(new ProcessStartInfo()
         {
@@ -149,5 +161,21 @@ internal sealed class RootCommand
             return null;
 
         return new(path);
+    }
+
+    public static string GetLanguage()
+    {
+        if (!OperatingSystem.IsWindows())
+            return "english";
+
+        using var key = Registry.CurrentUser
+            .OpenSubKey(@"Software\Valve\Steam\steamglobal")
+            ?? Registry.CurrentUser
+            .OpenSubKey(@"Software\Valve\Steamsteamglobal");
+
+        if (key?.GetValue("Language") is not string language)
+            return "english";
+
+        return new(language);
     }
 }
