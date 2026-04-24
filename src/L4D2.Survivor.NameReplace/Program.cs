@@ -56,8 +56,8 @@ File.WriteAllText(
     {
     	addonSteamAppID 550      
     	addonversion 1.0
-    	addontitle "Survivor name replace"
-    	addonauthor "frg2089 & L4D2.Survivor.NameReplace"
+    	addontitle "Survivor Name Replace"
+    	addonauthor "L4D2.Survivor.NameReplace ♥ from frg2089"
     	addonDescription "{{target}}"
 
     	addonContent_Campaign 0
@@ -80,13 +80,10 @@ File.WriteAllText(
 
 using Processor processor = new(target);
 
-// foreach (var package in vpks)
-{
-    processor.InitSurvivorsName(vpks[0], language);
-    processor.Process(vpks[0], Processor.JoinPath("resource", $"l4d360ui_{language}.txt"), Path.Combine(workdir.FullName, "resource", $"l4d360ui_{language}.txt"));
-    processor.Process(vpks[0], Processor.JoinPath("resource", $"closecaption_{language}.txt"), Path.Combine(workdir.FullName, "resource", $"closecaption_{language}.txt"));
-    processor.Process(vpks[0], Processor.JoinPath("resource", $"subtitles_{language}.txt"), Path.Combine(workdir.FullName, "resource", $"subtitles_{language}.txt"));
-}
+processor.InitSurvivorsName(vpks[0], language);
+processor.Process(vpks[0], Processor.JoinPath("resource", $"l4d360ui_{language}.txt"), Path.Combine(workdir.FullName, "resource", $"l4d360ui_{language}.txt"));
+processor.Process(vpks[0], Processor.JoinPath("resource", $"closecaption_{language}.txt"), Path.Combine(workdir.FullName, "resource", $"closecaption_{language}.txt"));
+processor.Process(vpks[0], Processor.JoinPath("resource", $"subtitles_{language}.txt"), Path.Combine(workdir.FullName, "resource", $"subtitles_{language}.txt"));
 
 Process.Start(new ProcessStartInfo()
 {
