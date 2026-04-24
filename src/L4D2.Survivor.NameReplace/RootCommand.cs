@@ -21,7 +21,7 @@ internal sealed class RootCommand
     [CliOption(Description = "求生者名称模板文件")]
     public FileInfo SurvivorNames { get; set; } = new(Path.Combine(AppContext.BaseDirectory, "SurvivorNames.ini"));
 
-    private readonly ImmutableArray<string> _gamePaths = ["left4dead2", "left4dead2_dlc1", "left4dead2_dlc2", "left4dead2_dlc3"];
+    // private readonly ImmutableArray<string> _gamePaths = ["left4dead2", "left4dead2_dlc1", "left4dead2_dlc2", "left4dead2_dlc3"];
 
     public async Task RunAsync()
     {
@@ -31,9 +31,10 @@ internal sealed class RootCommand
         var vpk = Path.Combine(GameFolder.FullName, "bin", "vpk.exe");
         var target = await LoadSurvivorNames();
 
-        var packages = _gamePaths
-            .Select(i => Path.Combine(GameFolder.FullName, i, "pak01_dir.vpk"))
-            .ToImmutableArray();
+        // var packages = _gamePaths
+        //     .Select(i => Path.Combine(GameFolder.FullName, i, "pak01_dir.vpk"))
+        //     .ToImmutableArray();
+        var package = Path.Combine(GameFolder.FullName, "left4dead2", "pak01_dir.vpk");
 
         var tmpdir = Directory.CreateTempSubdirectory();
         var workdir = tmpdir.CreateSubdirectory("l4d2-survivor-name-replace");
@@ -67,12 +68,12 @@ internal sealed class RootCommand
             }
             """);
 
-        using Processor processor = new(target);
+        Processor processor = new(target);
 
-        processor.InitSurvivorsName(packages[0], Language);
-        processor.Process(packages[0], Processor.JoinPath("resource", $"l4d360ui_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"l4d360ui_{Language}.txt"));
-        processor.Process(packages[0], Processor.JoinPath("resource", $"closecaption_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"closecaption_{Language}.txt"));
-        processor.Process(packages[0], Processor.JoinPath("resource", $"subtitles_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"subtitles_{Language}.txt"));
+        processor.InitSurvivorsName(package, Language);
+        processor.Process(package, Processor.JoinPath("resource", $"l4d360ui_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"l4d360ui_{Language}.txt"));
+        processor.Process(package, Processor.JoinPath("resource", $"closecaption_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"closecaption_{Language}.txt"));
+        processor.Process(package, Processor.JoinPath("resource", $"subtitles_{Language}.txt"), Path.Combine(workdir.FullName, "resource", $"subtitles_{Language}.txt"));
 
         using (var process = Process.Start(new ProcessStartInfo()
         {
@@ -98,35 +99,37 @@ internal sealed class RootCommand
         using var reader = SurvivorNames.OpenText();
         while (await reader.ReadLineAsync() is { } line)
         {
+            line = line.Split(';', 2)[0];
+
             var kvp = line.Split('=', 2);
             if (kvp.Length is not 2)
                 continue;
 
-            switch (kvp[0])
+            switch (kvp[0].Trim())
             {
                 case "Rochelle":
-                    target.Rochelle = kvp[1];
+                    target.Rochelle = kvp[1].Trim();
                     break;
                 case "Coach":
-                    target.Coach = kvp[1];
+                    target.Coach = kvp[1].Trim();
                     break;
                 case "Ellis":
-                    target.Ellis = kvp[1];
+                    target.Ellis = kvp[1].Trim();
                     break;
                 case "Nick":
-                    target.Nick = kvp[1];
+                    target.Nick = kvp[1].Trim();
                     break;
                 case "Bill":
-                    target.Bill = kvp[1];
+                    target.Bill = kvp[1].Trim();
                     break;
                 case "Zoey":
-                    target.Zoey = kvp[1];
+                    target.Zoey = kvp[1].Trim();
                     break;
                 case "Francis":
-                    target.Francis = kvp[1];
+                    target.Francis = kvp[1].Trim();
                     break;
                 case "Louis":
-                    target.Louis = kvp[1];
+                    target.Louis = kvp[1].Trim();
                     break;
             }
         }

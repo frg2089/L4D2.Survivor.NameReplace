@@ -10,7 +10,7 @@
 dotnet build
 ```
 
-### 运行
+### 生成模组
 
 ```bash
 dotnet run --project src/L4D2.Survivor.NameReplace/L4D2.Survivor.NameReplace.csproj
@@ -22,6 +22,14 @@ dotnet run --project src/L4D2.Survivor.NameReplace/L4D2.Survivor.NameReplace.csp
 dotnet run --project src/L4D2.Survivor.NameReplace/L4D2.Survivor.NameReplace.csproj --game-folder "D:\Steam\steamapps\common\Left 4 Dead 2"
 ```
 
+### 创建模板
+
+首次使用时，可通过子命令生成默认模板文件：
+
+```bash
+dotnet run --project src/L4D2.Survivor.NameReplace/L4D2.Survivor.NameReplace.csproj template
+```
+
 ### 配置
 
 编辑 `SurvivorNames.ini` 文件来自定义求生者名称：
@@ -31,15 +39,19 @@ Rochelle = 岛风; https://steamcommunity.com/sharedfiles/filedetails/?id=626852
 Coach = 时津风; https://steamcommunity.com/sharedfiles/filedetails/?id=636907324
 Ellis = 夕立; https://steamcommunity.com/sharedfiles/filedetails/?id=645180362
 Nick = 天津风; https://steamcommunity.com/sharedfiles/filedetails/?id=622094252
-Bill = 初月; https://steamcommunity.com/sharedfiles/filedetails/?id=1504088519
+Bill = Jervis; https://steamcommunity.com/sharedfiles/filedetails/?id=2504171098
 Zoey = 岛风; https://steamcommunity.com/sharedfiles/filedetails/?id=3112297048
 Francis = 江风; https://steamcommunity.com/sharedfiles/filedetails/?id=839307625
 Louis = 海风; https://steamcommunity.com/sharedfiles/filedetails/?id=1302754663
 ```
 
+支持的求生者：
+- 第一章（原始四人组）：Bill、Zoey、Francis、Louis
+- 第二章（新幸存者）：Coach、Ellis、Nick、Rochelle
+
 ### 输出
 
-运行后会在临时目录生成VPK模组文件，自动打开文件夹。
+运行后会在临时目录生成VPK模组文件，并自动打开文件夹。
 
 ## 技术栈
 

@@ -5,12 +5,9 @@ using SteamDatabase.ValvePak;
 
 namespace L4D2.Survivor.NameReplace;
 
-internal sealed class Processor(SurvivorNames target) : IDisposable
+internal sealed class Processor(SurvivorNames target)
 {
-    private bool _disposedValue;
     private SurvivorNames? _origin;
-
-    private readonly Dictionary<string, Package> _packages = [];
 
     public static string JoinPath(params string[] paths)
         => string.Join(Package.DirectorySeparatorChar, paths);
@@ -78,15 +75,11 @@ internal sealed class Processor(SurvivorNames target) : IDisposable
         });
     }
 
-    private bool Process(string vpkPath, string entryName, TextWriter? writer, Action<string[]> action)
+    private static bool Process(string vpkPath, string entryName, TextWriter? writer, Action<string[]> action)
     {
         vpkPath = Path.GetFullPath(vpkPath);
-        if (!_packages.TryGetValue(vpkPath, out var pkg))
-        {
-            pkg ??= new();
-            pkg.Read(vpkPath);
-            _packages[vpkPath] = new();
-        }
+        using Package pkg = new();
+        pkg.Read(vpkPath);
 
         if (pkg.FindEntry(entryName) is not { } entry)
             return false;
@@ -131,38 +124,5 @@ internal sealed class Processor(SurvivorNames target) : IDisposable
         }
 
         return brackets is 0;
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                // TODO: 释放托管状态(托管对象)
-                foreach (var item in _packages.Values)
-                {
-                    item.Dispose();
-                }
-            }
-
-            // TODO: 释放未托管的资源(未托管的对象)并重写终结器
-            // TODO: 将大型字段设置为 null
-            _disposedValue = true;
-        }
-    }
-
-    // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
-    ~Processor()
-    {
-        // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-        Dispose(disposing: false);
-    }
-
-    public void Dispose()
-    {
-        // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 }
