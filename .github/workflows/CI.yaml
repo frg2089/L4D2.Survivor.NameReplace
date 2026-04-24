@@ -56,5 +56,13 @@ jobs:
       - name: 生成
         run: dotnet build --graph --artifacts-path artifacts --configuration Release --no-restore
 
-      - name: 打包
-        run: dotnet pack --graph --artifacts-path artifacts --configuration Release --no-restore --no-build --include-symbols --include-source
+      - name: 发布
+        run: dotnet publish --graph --artifacts-path artifacts --configuration Release --no-restore --no-build --include-symbols --include-source
+
+      - name: 收集产物
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifacts
+          path: |
+            artifacts\publish\L4D2.Survivor.NameReplace\release\*
+          retention-days: 3

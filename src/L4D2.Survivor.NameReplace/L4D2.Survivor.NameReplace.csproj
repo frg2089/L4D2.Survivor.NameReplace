@@ -12,4 +12,8 @@
     <PackageReference Include="ValvePak" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="SurvivorNames.ini" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
