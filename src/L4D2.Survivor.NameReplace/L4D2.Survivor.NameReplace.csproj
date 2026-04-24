@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotMake.CommandLine" />
     <PackageReference Include="ValvePak" />
   </ItemGroup>
 
